@@ -79,8 +79,8 @@ veterans-india-ai/
 ### Method 1: Automated Setup (Recommended)
 1. **Clone the repository**
    ```bash
-   git clone <your-repo-url>
-   cd "Free Space Technologies Chatbot"
+   git clone https://github.com/sukumar38140/Veterans-India-Ai-Chatbot.git
+   cd "Veterans-India-Ai-Chatbot"
    ```
 
 2. **Run setup script**
