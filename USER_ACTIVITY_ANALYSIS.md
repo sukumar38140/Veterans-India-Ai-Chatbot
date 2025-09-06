@@ -35,12 +35,7 @@
    - **Response Type**: Web search (found N. Chandrababu Naidu)
    - **User Satisfaction**: 3.5/5
 
-3. **August 26, 2025 - 15:50:38**
-   - **Query**: "who is kumar saatharla?"
-   - **Response Type**: Regular (security filtered)
-   - **User Satisfaction**: 3.5/5
-
-4. **August 26, 2025 - 15:51:57**
+3. **August 26, 2025 - 15:51:57**
    - **Query**: "what do you know about veterans india"
    - **Response Type**: Detailed organizational information (3,015 characters)
    - **User Satisfaction**: 3.5/5

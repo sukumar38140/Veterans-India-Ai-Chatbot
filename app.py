@@ -359,15 +359,12 @@ st.markdown(
 )
 
 # -------------------
-# Initialize Session State with Real-time Data Features
+# Initialize Session State
 # -------------------
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
 if "answer_mode" not in st.session_state:
     st.session_state["answer_mode"] = "Detailed"
-# Enable real-time data by default
-if "enable_web_search" not in st.session_state:
-    st.session_state["enable_web_search"] = True
 
 # -------------------
 # Load LLM Models
@@ -407,9 +404,12 @@ def handle_identity_response(user_input):
 def generate_regular_ai_response(user_input, placeholder, llm_model):
     """Generate regular AI response with streaming"""
     response_text = ""
+    
     # Custom system context to ensure AI responds as Veterans India AI Assistant
     system_context = """You are Veterans India AI Assistant, created by Veterans India Team. When asked about your identity, always respond that you are Veterans India AI Assistant developed by Veterans India Team. Provide helpful, professional assistance."""
+    
     modified_input = f"{system_context}\n\nAnswer in {st.session_state['answer_mode']} mode:\n{user_input}"
+
     for chunk in llm_model.stream(modified_input):
         if hasattr(chunk, "content"):
             response_text += chunk.content
@@ -603,19 +603,17 @@ if user_input:
             unsafe_allow_html=True,
         )
     else:
-        # Enhanced real-time data keywords for Kumar Saatharla AI Agent
-        search_keywords = ["search", "latest", "current", "recent", "news", "today", "2025", "update", 
-                          "what", "who", "where", "when", "how", "price", "stock", "weather", 
-                          "time", "schedule", "live", "real-time", "now", "happening", "trend"]
+        # Check if user wants web search (contains keywords like "search", "latest", "current", "recent")
+        search_keywords = ["search", "latest", "current", "recent", "news", "today", "2025", "update"]
         needs_web_search = (
-            (any(keyword in user_input.lower() for keyword in search_keywords) or len(user_input.split()) > 3)
+            any(keyword in user_input.lower() for keyword in search_keywords) 
             and USE_WEB_SEARCH 
             and st.session_state.get("enable_web_search", True)
         )
         
         if needs_web_search:
             # Use web search for current/latest information
-            placeholder.markdown("<p style='color: #3b82f6; font-size: 13px; font-family: Inter, sans-serif;'>🔍 Accessing real-time data...</p>", unsafe_allow_html=True)
+            placeholder.markdown("<p style='color: #3b82f6; font-size: 13px; font-family: Inter, sans-serif;'>Searching for latest information...</p>", unsafe_allow_html=True)
             
             try:
                 response_text = search_web_and_answer(user_input, max_sites=6)
@@ -623,8 +621,8 @@ if user_input:
                     f"""
                     <div style='text-align: left; margin: 8px;'>
                         <div class='chat-bubble assistant-bubble'>
-                            <div style='background: rgba(59, 130, 246, 0.1); padding: 8px; border-radius: 5px; margin-bottom: 10px;'>
-                                <small>🌐 <strong>Real-time Data:</strong></small>
+                            <div style='background: rgba(255,165,0,0.1); padding: 8px; border-radius: 5px; margin-bottom: 10px;'>
+                                <small>🔍 <strong>Web Search Results:</strong></small>
                             </div>
                             {response_text}
                         </div>
@@ -635,7 +633,7 @@ if user_input:
                 )
             except Exception as e:
                 # Fallback to regular AI response if web search fails
-                placeholder.markdown("<p style='color: #ef4444; font-size: 13px; font-family: Inter, sans-serif;'>Real-time data unavailable, using AI knowledge...</p>", unsafe_allow_html=True)
+                placeholder.markdown("<p style='color: #ef4444; font-size: 13px; font-family: Inter, sans-serif;'>Search unavailable, using AI knowledge...</p>", unsafe_allow_html=True)
                 response_text = generate_regular_ai_response(user_input, placeholder, llm)
         else:
             # Regular AI response with enhanced prompting
@@ -655,8 +653,8 @@ if user_input:
 st.markdown(
     """
     <div class='footer tricolor-accent'>
-        <p style='margin: 0; color: #6b7280; font-size: 13px;'>Developed by <strong>Kumar Saatharla</strong></p>
-        <p style='margin: 0.25rem 0 0 0; font-size: 11px; color: #9ca3af;'>Personal AI Agent with Real-time Intelligence</p>
+        <p style='margin: 0; color: #6b7280; font-size: 13px;'>Developed by <strong>Veterans India Team</strong></p>
+        <p style='margin: 0.25rem 0 0 0; font-size: 11px; color: #9ca3af;'>Supporting Indian Veterans with AI Technology</p>
     </div>
     """,
     unsafe_allow_html=True,
