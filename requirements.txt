@@ -1,0 +1,28 @@
+# Veterans India AI Assistant - Dependencies
+# Developed by Veterans India Team
+# 
+langchain>=0.2.15
+langchain-community>=0.2.15
+langchain-core>=0.2.35
+langchain-text-splitters>=0.2.2
+langchain-ollama>=0.1.0
+chromadb>=0.5.5
+pypdf>=4.2.0
+beautifulsoup4>=4.12.3
+lxml>=5.2.2
+streamlit>=1.36.0
+
+# Additional LLM Support
+transformers>=4.35.0
+torch>=2.0.0
+accelerate>=0.25.0
+bitsandbytes>=0.41.0
+llama-cpp-python>=0.2.20
+sentencepiece>=0.1.99
+protobuf>=4.25.0
+
+# Optional: For CUDA support (uncomment if you have NVIDIA GPU)
+# torch-audio
+# torchaudio
+# --extra-index-url https://download.pytorch.org/whl/cu118
+

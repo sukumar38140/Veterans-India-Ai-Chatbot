@@ -1,0 +1,13 @@
+{
+  "last_training_time": "2025-08-26T16:39:33.119836",
+  "total_trainings": 1,
+  "config": {
+    "auto_training_enabled": true,
+    "training_interval_hours": 6,
+    "min_interactions_for_training": 10,
+    "max_training_data_size": 1000,
+    "backup_before_training": true,
+    "training_batch_size": 5,
+    "learning_rate": 0.01
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "last_updated": "2025-09-01T20:32:12.769200",
+  "available_models": {
+    "ollama": {
+      "llama3.2:1b": {
+        "name": "LLaMA 3.2 1B",
+        "description": "Fast and efficient Meta LLaMA model",
+        "size": "1.3GB",
+        "type": "ollama",
+        "model_id": "llama3.2:1b"
+      },
+      "llama3.2:3b": {
+        "name": "LLaMA 3.2 3B",
+        "description": "Balanced Meta LLaMA model",
+        "size": "2.0GB",
+        "type": "ollama",
+        "model_id": "llama3.2:3b"
+      },
+      "llama3.1:8b": {
+        "name": "LLaMA 3.1 8B",
+        "description": "Advanced Meta LLaMA model",
+        "size": "4.7GB",
+        "type": "ollama",
+        "model_id": "llama3.1:8b"
+      },
+      "mistral:7b": {
+        "name": "Mistral 7B",
+        "description": "Efficient Mistral AI model",
+        "size": "4.1GB",
+        "type": "ollama",
+        "model_id": "mistral:7b"
+      },
+      "codellama:7b": {
+        "name": "Code Llama 7B",
+        "description": "Meta's code generation model",
+        "size": "3.8GB",
+        "type": "ollama",
+        "model_id": "codellama:7b"
+      },
+      "phi3:mini": {
+        "name": "Phi-3 Mini",
+        "description": "Microsoft's efficient model",
+        "size": "2.3GB",
+        "type": "ollama",
+        "model_id": "phi3:mini"
+      },
+      "gemma2:2b": {
+        "name": "Gemma 2 2B",
+        "description": "Google's Gemma model",
+        "size": "1.6GB",
+        "type": "ollama",
+        "model_id": "gemma2:2b"
+      }
+    },
+    "huggingface": {
+      "microsoft/DialoGPT-small": {
+        "name": "DialoGPT Small",
+        "description": "Microsoft's conversational model",
+        "size": "117MB",
+        "type": "huggingface",
+        "model_id": "microsoft/DialoGPT-small"
+      },
+      "microsoft/DialoGPT-medium": {
+        "name": "DialoGPT Medium",
+        "description": "Microsoft's conversational model",
+        "size": "345MB",
+        "type": "huggingface",
+        "model_id": "microsoft/DialoGPT-medium"
+      },
+      "distilgpt2": {
+        "name": "DistilGPT2",
+        "description": "Efficient GPT-2 variant",
+        "size": "319MB",
+        "type": "huggingface",
+        "model_id": "distilgpt2"
+      },
+      "TinyLlama/TinyLlama-1.1B-Chat-v1.0": {
+        "name": "TinyLlama Chat",
+        "description": "Compact LLaMA variant",
+        "size": "2.2GB",
+        "type": "huggingface",
+        "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+      }
+    }
+  },
+  "project_root": "D:\\VeteransIndia AI Chatbot",
+  "local_models_dir": "D:\\VeteransIndia AI Chatbot\\local_models"
+}

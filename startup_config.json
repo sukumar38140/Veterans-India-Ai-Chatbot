@@ -1,0 +1,6 @@
+{
+  "model_cache_enabled": true,
+  "auto_model_detection": true,
+  "fast_startup": true,
+  "persistence_mode": true
+}

@@ -272,13 +272,20 @@ This AI Assistant is specifically designed to:
 
 ---
 
-## 🤝 Community & Support
+## 🤝 Contributing
+
+We welcome contributions from the veterans community and supporters. Please feel free to:
+- Report issues
+- Suggest improvements
+- Submit pull requests
+
+---
+
+## 📞 Support
 
 For support and inquiries, please contact:
 **Veterans India Team**
 
 ---
 
-**© 2025 Veterans India Team. Developed with ❤️ for Indian Veterans.**
-
-# Veterans-India-Ai-Chatbot
+**© 2025 Veterans India Team. Developed with ❤️ for Indian Veterans.**  

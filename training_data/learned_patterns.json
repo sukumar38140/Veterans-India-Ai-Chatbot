@@ -1,0 +1,26 @@
+{
+  "venue_search_keywords": [],
+  "web_search_keywords": [],
+  "successful_response_length": {
+    "good_avg_length": 0,
+    "poor_avg_length": 0,
+    "optimal_range": [
+      0,
+      1000
+    ]
+  },
+  "user_preferences": {
+    "preferred_response_types": {
+      "regular": {
+        "count": 15,
+        "avg_score": 3.374908447265625
+      },
+      "web_search": {
+        "count": 4,
+        "avg_score": 3.28125
+      }
+    },
+    "common_topics": [],
+    "preferred_detail_level": "detailed"
+  }
+}

@@ -1,0 +1,32 @@
+# Veterans India AI Assistant - Git Ignore File
+# Developed by Veterans India Team
+
+# Python virtual environment
+.venv/
+aimodels/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment files
+.env
+.env.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Local database
+*.db
+*.sqlite
+
