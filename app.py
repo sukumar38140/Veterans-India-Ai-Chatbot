@@ -13,9 +13,18 @@ import streamlit as st
 import pandas as pd
 import PyPDF2
 import docx
-from langchain_ollama import ChatOllama
-from langchain.prompts import PromptTemplate
 from datetime import datetime
+
+# Import LangChain components with error handling
+try:
+    from langchain_ollama import ChatOllama
+    from langchain.prompts import PromptTemplate
+    LANGCHAIN_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: LangChain not available: {e}")
+    LANGCHAIN_AVAILABLE = False
+    ChatOllama = None
+    PromptTemplate = None
 
 # Import our custom LLM configuration
 try:
@@ -425,29 +434,154 @@ def handle_identity_response(user_input):
 
 # Function to generate regular AI response
 def generate_regular_ai_response(user_input, placeholder, llm_model):
-    """Generate regular AI response with streaming"""
+    """Generate AI response with comprehensive error handling"""
     response_text = ""
     
-    # Custom system context to ensure AI responds as Veterans India AI Assistant
-    system_context = """You are Veterans India AI Assistant, created by Veterans India Team. When asked about your identity, always respond that you are Veterans India AI Assistant developed by Veterans India Team. Provide helpful, professional assistance."""
-    
-    modified_input = f"{system_context}\n\nAnswer in {st.session_state['answer_mode']} mode:\n{user_input}"
+    try:
+        # Check if LLM model is available
+        if not llm_model:
+            error_message = """
+            🤖 **AI Model Unavailable**
+            
+            The selected AI model is not currently available. This could be due to:
+            
+            • Ollama not being installed
+            • Selected model not downloaded
+            • Connection issues with the AI service
+            
+            **To resolve this:**
+            1. Install Ollama from https://ollama.com/download
+            2. Pull a model: `ollama pull llama3.2:1b`
+            3. Restart the application
+            
+            **Alternative:** You can still ask questions and I'll provide helpful information based on my knowledge about veteran services, benefits, and support resources.
+            """
+            placeholder.markdown(error_message, unsafe_allow_html=True)
+            return generate_fallback_response(user_input)
+        
+        # Custom system context to ensure AI responds as Veterans India AI Assistant
+        system_context = """You are Veterans India AI Assistant, created by Veterans India Team. When asked about your identity, always respond that you are Veterans India AI Assistant developed by Veterans India Team. Provide helpful, professional assistance."""
+        
+        modified_input = f"{system_context}\n\nAnswer in {st.session_state['answer_mode']} mode:\n{user_input}"
 
-    for chunk in llm_model.stream(modified_input):
-        if hasattr(chunk, "content"):
-            response_text += chunk.content
-            placeholder.markdown(
-                f"""
-                <div style='text-align: left; margin: 8px;'>
-                    <div class='chat-bubble assistant-bubble'>
-                        {response_text}
+        for chunk in llm_model.stream(modified_input):
+            if hasattr(chunk, "content"):
+                response_text += chunk.content
+                placeholder.markdown(
+                    f"""
+                    <div style='text-align: left; margin: 8px;'>
+                        <div class='chat-bubble assistant-bubble'>
+                            {response_text}
+                        </div>
+                        <div class='timestamp'>{datetime.now().strftime("%H:%M")}</div>
                     </div>
-                    <div class='timestamp'>{datetime.now().strftime("%H:%M")}</div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-    return response_text
+                    """,
+                    unsafe_allow_html=True,
+                )
+        return response_text
+    
+    except Exception as e:
+        # Handle connection and other errors
+        if USE_ERROR_HANDLING:
+            error_info = handle_app_error(e, "AI Model Response")
+            error_display = f"""
+            **{error_info['user_message']}**
+            
+            **Suggested Actions:**
+            {chr(10).join(f"• {action}" for action in error_info['suggested_actions'])}
+            
+            **Meanwhile, here's a helpful response based on available information:**
+            """
+            placeholder.markdown(error_display, unsafe_allow_html=True)
+        
+        # Provide fallback response
+        return generate_fallback_response(user_input)
+
+def generate_fallback_response(user_input):
+    """Generate a helpful fallback response when AI models are unavailable"""
+    user_input_lower = user_input.lower()
+    
+    if any(term in user_input_lower for term in ['benefit', 'pension', 'healthcare', 'medical']):
+        return """
+**Veterans Benefits Information**
+
+As a Veterans India AI Assistant, I can provide information about common veteran benefits:
+
+**Healthcare Benefits:**
+- Ex-Servicemen Contributory Health Scheme (ECHS)
+- Military hospitals and medical facilities
+- Specialized treatment for service-related injuries
+
+**Pension Benefits:**
+- Service pension for completed service
+- Disability pension for service-related disabilities
+- Family pension for dependents
+
+**Educational Benefits:**
+- Scholarships for veterans and their children
+- Skill development programs
+- Career transition support
+
+**Employment Support:**
+- Government job reservations
+- Corporate veteran hiring programs
+- Entrepreneurship support schemes
+
+For specific guidance on your situation, please contact your nearest veteran welfare office or visit the official Department of Ex-Servicemen Welfare website.
+"""
+    
+    elif any(term in user_input_lower for term in ['job', 'employment', 'career', 'work']):
+        return """
+**Employment Support for Veterans**
+
+Veterans India provides comprehensive employment assistance:
+
+**Government Opportunities:**
+- Reserved positions in central and state government
+- Public sector undertakings (PSUs) with veteran quotas
+- Defense civilian positions
+
+**Private Sector:**
+- Corporate veteran hiring initiatives
+- Skills translation programs
+- Leadership development opportunities
+
+**Entrepreneurship:**
+- Business loans with preferential rates
+- Mentorship programs
+- Startup incubation support
+
+**Resources:**
+- Resume building assistance
+- Interview preparation
+- Professional networking events
+
+Contact your local Employment Exchange or veteran service organizations for personalized job placement assistance.
+"""
+    
+    else:
+        return f"""
+**Veterans India AI Assistant**
+
+Thank you for your question: "{user_input}"
+
+I'm here to help with veteran-related information and support. While the full AI capabilities are currently unavailable, I can still provide guidance on:
+
+• **Benefits and Pensions** - Healthcare, financial support, and entitlements
+• **Employment Services** - Job placement, career transition, and opportunities  
+• **Educational Support** - Scholarships, training, and skill development
+• **Family Services** - Support for veteran families and dependents
+• **Legal Assistance** - Rights awareness and legal support resources
+
+Please feel free to ask more specific questions about any of these areas, and I'll provide the most helpful information available.
+
+For immediate assistance, you can also contact:
+- **Veteran Helpline**: Available through your state veteran welfare office
+- **Online Portal**: Ex-Servicemen Welfare website
+- **Local Offices**: District Sainik Welfare offices
+
+*Developed by Veterans India Team - Supporting Indian Veterans with AI Technology*
+"""
 
 try:
     llm = load_model(st.session_state["selected_model"])
