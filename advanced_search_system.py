@@ -13,16 +13,86 @@ from typing import List, Dict, Optional
 import json
 from datetime import datetime
 import time
-from googlesearch import search as google_search
-import newspaper
-from readability import Document
-import trafilatura
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 import logging
 
-# Setup logging
+# Setup logging first
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Optional imports with fallbacks
+try:
+    from googlesearch import search as google_search
+    GOOGLE_SEARCH_AVAILABLE = True
+except ImportError:
+    logger.warning("Google search not available - install googlesearch-python")
+    GOOGLE_SEARCH_AVAILABLE = False
+    google_search = None
+
+try:
+    import newspaper
+    NEWSPAPER_AVAILABLE = True
+except ImportError:
+    logger.warning("Newspaper3k not available - install newspaper3k")
+    NEWSPAPER_AVAILABLE = False
+    newspaper = None
+
+try:
+    from readability import Document
+    READABILITY_AVAILABLE = True
+except ImportError:
+    logger.warning("Readability not available - install readability")
+    READABILITY_AVAILABLE = False
+    Document = None
+
+try:
+    import trafilatura
+    TRAFILATURA_AVAILABLE = True
+except ImportError:
+    logger.warning("Trafilatura not available - install trafilatura")
+    TRAFILATURA_AVAILABLE = False
+    trafilatura = None
+
+try:
+    from langchain.text_splitter import RecursiveCharacterTextSplitter
+    LANGCHAIN_TEXT_SPLITTER_AVAILABLE = True
+except ImportError:
+    logger.warning("LangChain text splitter not available - using basic splitting")
+    LANGCHAIN_TEXT_SPLITTER_AVAILABLE = False
+    RecursiveCharacterTextSplitter = None
+
+class BasicTextSplitter:
+    """Basic text splitter fallback when LangChain is not available"""
+    def __init__(self, chunk_size=2000, chunk_overlap=200):
+        self.chunk_size = chunk_size
+        self.chunk_overlap = chunk_overlap
+    
+    def split_text(self, text: str) -> List[str]:
+        """Split text into chunks"""
+        if len(text) <= self.chunk_size:
+            return [text]
+        
+        chunks = []
+        start = 0
+        while start < len(text):
+            end = start + self.chunk_size
+            if end >= len(text):
+                chunks.append(text[start:])
+                break
+            
+            # Try to split at a sentence or word boundary
+            chunk = text[start:end]
+            last_period = chunk.rfind('.')
+            last_space = chunk.rfind(' ')
+            
+            if last_period > self.chunk_size * 0.8:
+                end = start + last_period + 1
+            elif last_space > self.chunk_size * 0.8:
+                end = start + last_space
+            
+            chunks.append(text[start:end])
+            start = end - self.chunk_overlap
+        
+        return chunks
 
 class AdvancedSearchSystem:
     """
@@ -38,10 +108,19 @@ class AdvancedSearchSystem:
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         })
-        self.text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=2000,
-            chunk_overlap=200
-        )
+        
+        # Initialize text splitter with fallback
+        if LANGCHAIN_TEXT_SPLITTER_AVAILABLE:
+            self.text_splitter = RecursiveCharacterTextSplitter(
+                chunk_size=2000,
+                chunk_overlap=200
+            )
+        else:
+            self.text_splitter = BasicTextSplitter(
+                chunk_size=2000,
+                chunk_overlap=200
+            )
+        
         self.llm_config = llm_config
         
     async def search_and_scrape(self, query: str, max_sites: int = 10, max_content_length: int = 50000) -> Dict:
@@ -79,6 +158,10 @@ class AdvancedSearchSystem:
     async def get_search_urls(self, query: str, max_results: int = 10) -> List[str]:
         """Get URLs from Google search"""
         try:
+            if not GOOGLE_SEARCH_AVAILABLE:
+                logger.warning("Google search not available, using fallback URLs")
+                return self.fallback_search_urls(query)
+                
             # Use googlesearch-python library
             urls = []
             for url in google_search(query, num_results=max_results, sleep_interval=1):
@@ -346,14 +429,39 @@ async def search_and_process(query: str, max_sites: int = 8) -> str:
 
 # Synchronous wrapper for direct use
 def search_web_and_answer(query: str, max_sites: int = 8) -> str:
-    """Synchronous version of search_and_process"""
+    """Synchronous version of search_and_process with fallback"""
     try:
         loop = asyncio.get_event_loop()
     except RuntimeError:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
     
-    return loop.run_until_complete(search_and_process(query, max_sites))
+    try:
+        return loop.run_until_complete(search_and_process(query, max_sites))
+    except Exception as e:
+        logger.error(f"Web search failed: {e}")
+        return simple_fallback_response(query)
+
+def simple_fallback_response(query: str) -> str:
+    """Simple fallback response when web search is not available"""
+    return f"""I apologize, but I'm currently unable to search the web for real-time information about "{query}".
+
+This could be due to:
+- Missing dependencies (googlesearch-python, newspaper3k, trafilatura)
+- Network connectivity issues
+- Service limitations
+
+For veterans-related queries, I can still help with:
+- General information about veteran benefits and services
+- Guidance on pension schemes and healthcare
+- Educational support and career transition advice
+- Information about veteran organizations
+
+Please provide more specific questions, and I'll do my best to assist with the information I have available.
+
+To enable web search functionality, please install the required dependencies:
+pip install googlesearch-python newspaper3k trafilatura langchain-community
+"""
 
 if __name__ == "__main__":
     # Test the system
