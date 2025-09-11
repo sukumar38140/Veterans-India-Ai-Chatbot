@@ -17,15 +17,32 @@ from typing import Dict, Any, Optional, List
 from pathlib import Path
 from datetime import datetime
 
-# Import required libraries
-from langchain_ollama import ChatOllama
-from langchain_community.llms import HuggingFacePipeline
-from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
-import torch
-
-# Setup logging
+# Setup logging first
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Import required libraries with error handling
+try:
+    from langchain_ollama import ChatOllama
+    OLLAMA_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"Ollama not available: {e}")
+    OLLAMA_AVAILABLE = False
+    ChatOllama = None
+
+try:
+    from langchain_community.llms import HuggingFacePipeline
+    from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+    import torch
+    HUGGINGFACE_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"HuggingFace/Transformers not available: {e}")
+    HUGGINGFACE_AVAILABLE = False
+    HuggingFacePipeline = None
+    AutoTokenizer = None
+    AutoModelForCausalLM = None
+    pipeline = None
+    torch = None
 
 class LLMManager:
     """
@@ -209,6 +226,10 @@ class LLMManager:
     
     def load_ollama_model(self, model_id: str, **kwargs) -> Optional[ChatOllama]:
         """Load an Ollama model."""
+        if not OLLAMA_AVAILABLE:
+            logger.error("Ollama ChatOllama not available. Please install langchain-ollama.")
+            return None
+            
         try:
             # Set environment variable for local model storage
             os.environ['OLLAMA_MODELS'] = str(self.ollama_models_dir)
@@ -229,6 +250,10 @@ class LLMManager:
     
     def download_hf_model(self, model_id: str) -> bool:
         """Download a Hugging Face model locally."""
+        if not HUGGINGFACE_AVAILABLE:
+            logger.error("HuggingFace/Transformers not available. Please install transformers and torch.")
+            return False
+            
         try:
             model_path = self.hf_models_dir / model_id.replace('/', '_')
             model_path.mkdir(parents=True, exist_ok=True)
@@ -259,6 +284,10 @@ class LLMManager:
     
     def load_hf_model(self, model_id: str, **kwargs) -> Optional[HuggingFacePipeline]:
         """Load a Hugging Face model from local storage."""
+        if not HUGGINGFACE_AVAILABLE:
+            logger.error("HuggingFace/Transformers not available. Please install transformers and torch.")
+            return None
+            
         try:
             model_path = self.hf_models_dir / model_id.replace('/', '_')
             

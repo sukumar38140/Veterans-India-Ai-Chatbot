@@ -25,6 +25,7 @@ try:
 except ImportError as e:
     print(f"Warning: Could not import LLM configuration: {e}")
     USE_MULTI_LLM = False
+    llm_manager = None
 
 # Import advanced search system
 try:
@@ -33,6 +34,28 @@ try:
 except ImportError as e:
     print(f"Warning: Could not import advanced search system: {e}")
     USE_WEB_SEARCH = False
+
+# Import error handling system
+try:
+    from error_handler import handle_app_error, safe_execute, display_error_info, global_error_handler
+    USE_ERROR_HANDLING = True
+except ImportError as e:
+    print(f"Warning: Could not import error handling system: {e}")
+    USE_ERROR_HANDLING = False
+    
+    # Fallback error handling
+    def handle_app_error(error, context="Application"):
+        return {"user_message": f"Error in {context}: {str(error)}", "error_code": "UNKNOWN"}
+    
+    def safe_execute(func, *args, context="Function", default_return=None, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            st.error(f"Error in {context}: {str(e)}")
+            return default_return
+    
+    def display_error_info(error_info):
+        return error_info.get("user_message", "An error occurred")
 
 # -------------------
 # Streamlit Page Config
